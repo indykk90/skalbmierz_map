@@ -1,0 +1,105 @@
+<html>
+<head>
+  <title>Gmina Skalbmierz</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+  <script src="/js/leaflet-0.7.2/leaflet.ajax.min.js"></script>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <!-- GeoJSON-->
+  <script src="../Data/JS/gmina.js"></script>
+  <script src="../Data/JS/skalb.js"></script>
+</head>
+
+
+<body>
+  <div id="map">
+    <button type="button" id="target" class="btn btn-primary" onClick="window.location.reload();">Bring me back!</button>
+    <div id="showWeatherForcast" class="weather-container border border-primary rounded text-center p-2"></div>
+    <div id="logoContainer" class="row"><a href="http://www.skalbmierz.eu/" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Click and visit our webiste!"><img src="../Data/IMG/POL_Skalbmierz_COA.svg.png" width="100"></a>
+    <h1 class="my-auto font-weight-bold gmina">&nbsp;GMINA SKALBMIERZ</h1></div>
+  </div>
+  
+  <script>  
+  //  HERE Basemap API
+   const here = {
+     apiKey:'YzIYwQpS4P_M_ufPCTR2QGt7jkBQd1NmAYUnB7eGrDQ'
+   }
+   const style = 'normal.day.grey';
+
+   const hereTileUrl = `https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/${style}/{z}/{x}/{y}/512/png8?apiKey=${here.apiKey}&ppi=320`;
+
+   const map = L.map('map', {
+      center: [50.319893, 20.399833],
+      zoom: 12,
+      layers: [L.tileLayer(hereTileUrl)]
+   });
+   map.attributionControl.addAttribution('&copy; HERE 2019');
+  // end of HERE Basemap API  
+
+var picURL2 = 'https://v.wpimg.pl/NDI5Mzk1YSUoVztJREpsMGsPbxMCE2JmPBd3WER-YXJ9ATVJXQNhLWdCPVQbXWElZlNiEBtUKWt6A3xNXB4dLyhZLxcCVDw-Fk8SFgRFOxs5QSwRCm43KzxBOBgOHy0rJGo-GRlUKyo6XSIORVs-IS4XMA==';
+
+// Handling GeoJSON
+L.geoJson(gminaSkalb, {
+         onEachFeature: function (feature, layer) {
+            layer.bindPopup('<h4 class="text-center">'+feature.properties.JPT_NAZWA_+'</h4><p><b>Area:</b> '+feature.properties.Area+'</p><p><b>Population(total):</b> '+feature.properties.Population+'</p><p><b>Population(density):</b> '+feature.properties.Density+'</p><img src=' + picURL2 + '" + " class=popupImage " + "/>');
+            maxWidth: "auto"
+            }
+      
+}).addTo(map);
+
+L.geoJson(poisSkalb, {
+         onEachFeature: function (feature, layer) {
+            layer.bindPopup('<h4><p>'+feature.properties.Zabytek+'</h4>');
+        }
+        
+
+}).addTo(map);
+// End of Handling GeoJSON
+
+// weather widget
+var key = "e716c26abf02cd2c7b25a520c4db0e45";
+var city = "Skalbmierz"; 
+var url = "https://api.openweathermap.org/data/2.5/weather?";
+
+$.ajax({
+  url: "https://api.openweathermap.org/data/2.5/weather?",
+  dataType: "json",
+  type: "GET",
+  data: {
+    q: city,
+    appid: key,
+    units: "metric",
+    cnt: "10"
+  },
+  success: function(data) {
+    console.log('Received data:', data) // For testing
+    var wf = "";
+    var temp = Math.round(parseFloat(data['main']['temp'])) + `°C`;
+    var weather_description = data["weather"][0]["description"];
+    iconCode = data["weather"][0]["icon"];
+    iconUrl = "http://openweathermap.org/img/w/" + iconCode + ".png";
+    $.each(data.weather, function(index, val) {
+        console.log(data.weather);
+        wf += "<img src="+ iconUrl +">" + "<hr>"; 
+        wf += "<h4>" + temp + "</h4>"+ "<hr>";
+        wf += "<h4>" + weather_description + "</h4>";
+    });
+    $("#showWeatherForcast").html(wf);
+  }
+});
+// end of weather widget
+</script>
+</body>
+</html>
