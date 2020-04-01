@@ -19,14 +19,55 @@
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <!-- GeoJSON-->
   <script src="../Data/JS/gmina.js"></script>
-  <script src="../Data/JS/skalb.js"></script>
+  <script src="../Data/JS/skalb.js"></script> 
 </head>
 
 
 <body>
   <div id="map">
     <button type="button" id="target" class="btn btn-primary" onClick="window.location.reload();">Bring me back!</button>
-    <div id="showWeatherForcast" class="weather-container border border-primary rounded text-center p-2"></div>
+    
+          <!-- <div id="showWeatherForcast" class="weather-container border border-primary rounded text-center p-2"></div> -->
+    <div id="accordion" class="w-25" style="cursor: pointer;">
+      <div class="card d-block">
+        <div class="card-header">
+          <a class="accordion-toggle card-link" data-toggle="collapse" href="#collapseOne">
+            <span><img src="../Data/IMG/weather.svg" width="40px">&nbsp;&nbsp;&nbsp;Weather</span>
+          </a>
+        </div>
+        <div id="collapseOne" class="collapse show" data-parent="#accordion">
+          <div class="card-body">
+            <div id="showWeatherForcast" class="weather-container border border-secondary rounded text-center p-2"></div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="card">
+        <div class="card-header">
+          <a class="accordion-toggle collapsed card-link" data-toggle="collapse" href="#collapseTwo">
+            <span><img src="../Data/IMG/carbon-dioxide.svg" width="40px">&nbsp;&nbsp;&nbsp;Air Quality</span>
+          </a>
+        </div>
+        <div id="collapseTwo" class="collapse" data-parent="#accordion">
+          <div class="card-body">
+            <div><h2 class="test border border-secondary rounded text-center p-2" id="city-aqi-container"></div>
+          </div>
+        </div>
+      </div>
+    
+      <div class="card">
+        <div class="card-header">
+          <a class="accordion-toggle collapsed card-link" data-toggle="collapse" href="#collapseThree">
+            <span><img src="../Data/IMG/article.svg" width="40px">&nbsp;&nbsp;&nbsp;City News</span>
+          </a>
+        </div>
+        <div id="collapseThree" class="collapse" data-parent="#accordion">
+          <div class="card-body">
+            <iframe src="http://www.skalbmierz.eu/" width = "100%" height = "300px"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="logoContainer" class="row"><a href="http://www.skalbmierz.eu/" target="_blank" data-toggle="tooltip" data-placement="bottom" title="Click and visit our webiste!"><img src="../Data/IMG/POL_Skalbmierz_COA.svg.png" width="100"></a>
     <h1 class="my-auto font-weight-bold gmina">&nbsp;GMINA SKALBMIERZ</h1></div>
   </div>
@@ -93,13 +134,46 @@ $.ajax({
     $.each(data.weather, function(index, val) {
         console.log(data.weather);
         wf += "<img src="+ iconUrl +">" + "<hr>"; 
-        wf += "<h4>" + temp + "</h4>"+ "<hr>";
-        wf += "<h4>" + weather_description + "</h4>";
+        wf += "<h6>" + temp + "</h6>"+ "<hr>";
+        wf += "<h6>" + weather_description + "</h6>";
     });
     $("#showWeatherForcast").html(wf);
   }
 });
 // end of weather widget
+
+$.ajax({
+    url: 'https://airapi.airly.eu/v2/measurements/nearest?lat=50.34190&lng=20.21785&maxDistanceKM=5',
+    headers: {'apikey': '8psCbGcgUSCEtNJEx13M9jZaFlCOKnFV'},
+
+    success: function (response) {
+        console.log(response);
+        var aq = "";
+        var PM1 = response["current"]["values"][0]["value"];
+        var PM25 = response["current"]["values"][1]["value"];
+        var PM10 = response["current"]["values"][2]["value"];
+        var airdescription = response["current"]["indexes"][0]["description"];
+        var airvalue = response["current"]["indexes"][0]["value"];
+        var color = response["current"]["indexes"][0]["color"]
+        var textcolor = {'background-color': color};
+        // console.log(textcolor);
+        // console.log(color);
+        console.log(PM1);
+        $.each(response.current.indexes, function(index, val) {
+        console.log(response.current);
+        console.log(color);
+        aq += "<h4>"+ airvalue + "<h4>"+ "<h6> CAQI (PM)</h6>"+"<hr>";
+        aq += "<h6>"+ "<b>" + airdescription + "</b>" + "</h6>"+ "<hr>";
+        $("#city-aqi-container").css('background-color', color);
+        aq += "<h6><b>PM 10</b>: "+ PM10 +"</h6>"+ "<hr>";
+        aq += "<h6><b>PM 2.5</b>: "+ PM25 +"</h6>"+ "<hr>";
+        aq += "<h6><b>PM 1</b>: "+ PM1 +"</h6>"+ "<hr>";
+   
+    });
+    $("#city-aqi-container").html(aq);
+    }
+});
+
 </script>
 </body>
 </html>

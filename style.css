@@ -23,12 +23,12 @@ max-height: 100%;
 
 #target{
     z-index: 1000;
-    position: relative;
-    top: 15px;
+    position: absolute;
+    bottom: 15px;
     float:right;
-    right: 15px;
+    left: 15px;
 }
-
+/* 
 .weather-container{
     height: auto;
     width: auto;
@@ -37,8 +37,33 @@ max-height: 100%;
     right: 15px;
     top: 90px;
     background-color: white;
-}
+} */
 
 .gmina{
     text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+}
+
+/* #city-aqi-container{
+    height: auto;
+    width: auto;
+    z-index: 1000;
+    position: absolute;
+    right: 15px;
+    top: 300px;
+    background-color: white;
+} */
+
+#accordion{
+    z-index: 1000;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+}
+
+.accordion-toggle {
+    display: block;
+}
+
+.card-header{
+    padding: 0;
 }
